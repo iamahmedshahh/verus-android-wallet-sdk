@@ -98,7 +98,7 @@ interface Derivation {
 
     fun encryptVerusData(
         addressString: String,
-        message: String,
+        data: ByteArray,
         returnSsk: Boolean
     ): EncryptedPayload
 

@@ -110,16 +110,16 @@ class RustDerivationTool private constructor() : Derivation {
 
     override fun encryptVerusData(
         addressString: String,
-        message: String,
+        data: ByteArray,
         returnSsk: Boolean
-    ): EncryptedPayload = encryptData(addressString, message, returnSsk)
+    ): EncryptedPayload = encryptData(addressString, data, returnSsk)
 
     override fun decryptVerusData(
-        dfvkHex: String?,
+        ivkBytes: ByteArray?,
         ephemeralPublicKeyHex: String?,
         ciphertextHex: String,
         symmetricKeyHex: String?
-    ): String = decryptData(dfvkHex, ephemeralPublicKeyHex, ciphertextHex, symmetricKeyHex)
+    ): String = decryptData(ivkBytes, ephemeralPublicKeyHex, ciphertextHex, symmetricKeyHex)
 
     companion object {
         suspend fun new(): Derivation {
@@ -216,13 +216,13 @@ class RustDerivationTool private constructor() : Derivation {
         @JvmStatic
         private external fun encryptData(
             addressString: String,
-            message: String,
+            data: ByteArray,
             returnSsk: Boolean
         ): EncryptedPayload
 
         @JvmStatic
         private external fun decryptData(
-            dfvkHex: String?,
+            ivkBytes: ByteArray?,
             ephemeralPublicKeyHex: String?,
             ciphertextHex: String,
             symmetricKeyHex: String?

@@ -7,6 +7,7 @@ import cash.z.ecc.android.sdk.model.UnifiedSpendingKey
 import cash.z.ecc.android.sdk.model.ShieldedSpendingKey
 import cash.z.ecc.android.sdk.model.SharedSecret
 import cash.z.ecc.android.sdk.model.ChannelKeys
+import cash.z.ecc.android.sdk.model.DecryptParams
 import cash.z.ecc.android.sdk.model.ZcashNetwork
 import cash.z.ecc.android.sdk.tool.DerivationTool
 import cash.z.ecc.android.sdk.internal.ext.Hex
@@ -115,20 +116,39 @@ internal class TypesafeDerivationToolImpl(private val derivation: Derivation) : 
 
     override suspend fun encryptVerusData(
         address: String,
-        message: String,
+        data: ByteArray,
         returnSsk: Boolean
     ): EncryptedPayload {
         // These parameters don't need conversion, so we just pass them through.
-        return derivation.encryptVerusData(address, message, returnSsk)
+        return derivation.encryptVerusData(address, data, returnSsk)
     }
 
     override suspend fun decryptVerusData(
-        ivkBytes: String?,
+        ivkBytes: ByteArray?,
         epkHex: String?,
         ciphertextHex: String,
         sskHex: String?
     ): String {
         // These parameters also don't need conversion, so we just pass them through.
         return derivation.decryptVerusData(ivkBytes, epkHex, ciphertextHex, sskHex)
+    }
+
+    override suspend fun encryptData(
+        address: String,
+        data: ByteArray,
+        returnSsk: Boolean
+    ): EncryptedPayload {
+        return derivation.encryptVerusData(address, data, returnSsk)
+    }
+
+    override suspend fun decryptData(
+        params: DecryptParams
+    ): String {
+        return derivation.decryptVerusData(
+            params.ivkBytes,
+            params.ephemeralPublicKeyHex,
+            params.ciphertextHex,
+            params.symmetricKeyHex
+        )
     }
 }

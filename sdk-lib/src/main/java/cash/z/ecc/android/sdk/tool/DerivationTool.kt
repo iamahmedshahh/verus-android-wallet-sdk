@@ -12,6 +12,7 @@ import cash.z.ecc.android.sdk.model.ShieldedSpendingKey
 import cash.z.ecc.android.sdk.model.SharedSecret
 import cash.z.ecc.android.sdk.model.ZcashNetwork
 import cash.z.ecc.android.sdk.model.ChannelKeys
+import cash.z.ecc.android.sdk.model.DecryptParams
 import cash.z.ecc.android.sdk.model.EncryptedPayload
 interface DerivationTool {
     /**
@@ -177,33 +178,57 @@ interface DerivationTool {
     ): ChannelKeys
 
     /**
-     * Encrypts a message for a given z-address using Verus-specific message encryption.
+     * Encrypts data for a given z-address using Verus-specific encryption.
      *
      * @param address The recipient's z-address.
-     * @param message The plaintext message to encrypt.
+     * @param data The data to encrypt as a ByteArray.
      * @param returnSsk If true, the symmetric key used for encryption will be returned in the payload. Defaults to false.
      * @return An [EncryptedPayload] containing the ciphertext and public key material.
      */
     suspend fun encryptVerusData(
         address: String,
-        message: String,
+        data: ByteArray,
         returnSsk: Boolean = false
     ): EncryptedPayload
 
     /**
-     * Decrypts a Verus-specific encrypted message.
+     * Decrypts Verus-specific encrypted data.
      *
-     * @param fvkHex The recipient's hex-encoded full viewing key. Not needed if sskHex is provided.
+     * @param ivkBytes The recipient's incoming viewing key bytes. Not needed if sskHex is provided.
      * @param epkHex The sender's hex-encoded ephemeral public key. Not needed if sskHex is provided.
-     * @param ciphertextHex The hex-encoded encrypted message.
-     * @param sskHex The hex-encoded symmetric session key. If provided, fvkHex and epkHex are ignored.
-     * @return The decrypted plaintext message as a String.
+     * @param ciphertextHex The hex-encoded encrypted data.
+     * @param sskHex The hex-encoded symmetric session key. If provided, ivkBytes and epkHex are ignored.
+     * @return The decrypted plaintext data as a String.
      */
     suspend fun decryptVerusData(
-        ivkBytes: String?,
+        ivkBytes: ByteArray?,
         epkHex: String?,
         ciphertextHex: String,
         sskHex: String?
+    ): String
+
+    /**
+     * Encrypts data for a given z-address.
+     *
+     * @param address The recipient's z-address.
+     * @param data The data to encrypt as a ByteArray.
+     * @param returnSsk If true, the symmetric key will be returned.
+     * @return An [EncryptedPayload] containing the encrypted data.
+     */
+    suspend fun encryptData(
+        address: String,
+        data: ByteArray,
+        returnSsk: Boolean = false
+    ): EncryptedPayload
+
+    /**
+     * Decrypts data using the provided parameters.
+     *
+     * @param params The [DecryptParams] containing all decryption parameters.
+     * @return The decrypted plaintext data as a String.
+     */
+    suspend fun decryptData(
+        params: DecryptParams
     ): String
 
     companion object {

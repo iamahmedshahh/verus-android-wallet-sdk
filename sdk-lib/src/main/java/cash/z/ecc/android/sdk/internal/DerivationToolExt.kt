@@ -127,19 +127,19 @@ fun Derivation.getVerusEncryptionAddress(
 )
 
 
-fun Derivation.encryptMessage(
+fun Derivation.encryptData(
     address: String,
-    message: String,
+    data: ByteArray,
     returnSsk: Boolean
 ): EncryptedPayload {
-    return encryptVerusMessage(address, message, returnSsk)
+    return encryptVerusData(address, data, returnSsk)
 }
 
-fun Derivation.decryptMessage(
+fun Derivation.decryptData(
     params: DecryptParams
 ): String {
-    return decryptVerusMessage(
-        dfvkHex = params.dfvkHex,
+    return decryptVerusData(
+        ivkBytes = params.ivkBytes,
         ephemeralPublicKeyHex = params.ephemeralPublicKeyHex,
         ciphertextHex = params.ciphertextHex,
         symmetricKeyHex = params.symmetricKeyHex

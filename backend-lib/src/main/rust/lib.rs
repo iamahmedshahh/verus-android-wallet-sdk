@@ -219,7 +219,7 @@ fn account_id_from_jni<'local, P: Parameters>(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_initOnLoad<'local>(
     _env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -264,7 +264,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_initOnLoa
 /// Sets up the internal structure of the blockmeta database.
 ///
 /// Returns 0 if successful, or -1 otherwise.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_initBlockMetaDb<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -289,7 +289,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_initBlock
 /// - 0 if successful.
 /// - 1 if the seed must be provided in order to execute the requested migrations.
 /// - 2 if the provided seed is not relevant to any of the derived accounts in the wallet.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_initDataDb<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -374,7 +374,7 @@ pub fn encode_channel_keys<'a>(
     extfvk_bytes: &ExtendedFullViewingKey, // same
     spending_key_bytes: Option<&Secret<[u8; 169]>>,
     ivk_bytes: &[u8; 32],
-) -> jni::errors::Result<JObject<'a>> {
+) -> anyhow::Result<JObject<'a>> {
 
     // encode address to bech32 string and then to java string 
     let address_str = address.encode(&MainNetwork);
@@ -382,7 +382,7 @@ pub fn encode_channel_keys<'a>(
 
     let mut fvk_serialized = Vec::new();
     extfvk_bytes.write(&mut fvk_serialized)
-        .map_err(|e| jni::errors::Error::Other(format!("Failed to serialize extfvk: {}", e).into()))?;
+        .map_err(|e| anyhow!("Failed to serialize extfvk: {}", e))?;
 
 
     let fvk_java = env.byte_array_from_slice(&fvk_serialized)?;
@@ -449,7 +449,7 @@ fn decode_extsk(env: &JNIEnv, extsk: JByteArray) -> anyhow::Result<ExtendedSpend
 /// automated account recovery).
 ///
 /// [ZIP 316]: https://zips.z.cash/zip-0316
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_createAccount<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -502,7 +502,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_createAcc
 
 
 /// Checks whether the given seed is relevant to any of the derived accounts in the wallet.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isSeedRelevantToAnyDerivedAccounts<
     'local,
 >(
@@ -531,7 +531,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isSeedRel
 /// Returns the newly created [ZIP 316] account identifier, along with the binary encoding
 /// of the [`UnifiedSpendingKey`] for the newly created account. The caller should store
 /// the returned spending key in a secure fashion.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveSpendingKey<
     'local,
 >(
@@ -568,7 +568,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
 }
 
 /// Derives and returns a sapling spending key from the given seed for the given account ID.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveShieldedSpendingKey<
     'local,
 >(
@@ -593,7 +593,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveUnifiedFullViewingKeysFromSeed<
     'local,
 >(
@@ -642,7 +642,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveViewingKey<
     'local,
 >(
@@ -690,7 +690,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveUnifiedAddressFromSeed<
     'local,
 >(
@@ -727,7 +727,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveShieldedAddressFromSeed<
     'local,
 >(
@@ -762,7 +762,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveUnifiedAddressFromViewingKey<
     'local,
 >(
@@ -798,7 +798,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveShieldedAddressFromViewingKey<
     'local,
 >(
@@ -834,7 +834,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_deriveUnifiedFullViewingKey<
     'local,
 >(
@@ -859,7 +859,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_getSymmetricKeyReceiver<
     'local,
 >(
@@ -916,7 +916,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_ge
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_generateSymmetricKeySender<
     'local,
 >(
@@ -967,7 +967,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_ge
     });
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_zGetEncryptionAddress<'local>(
     mut env: JNIEnv<'local>,
@@ -1019,7 +1019,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_zG
         };
 
         // this is the pure rust function in 'verus_zfunc' crate
-        let channel_keys = z_getencryptionaddress(seed.as_ref(), spending_key.as_ref(), hd_index, encryption_index, from_id_bytes.as_ref(), to_id_bytes.as_ref(), return_secret)
+        let channel_keys = z_getencryptionaddress(seed.as_ref(), spending_key.as_ref(), hd_index, Some(encryption_index), from_id_bytes.as_ref(), to_id_bytes.as_ref(), return_secret)
             .map_err(|e| anyhow!("z_getencryptionaddress failed: {}", e))?;
         
         let result = encode_channel_keys(
@@ -1034,47 +1034,42 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_zG
    unwrap_exc_or(&mut env, res, std::ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_encryptData<'local>(
         mut env: JNIEnv<'local>,
         _class: JObject<'local>,
-        address_bytes: JByteArray<'local>,
+        address_string: JString<'local>,
         data: JByteArray<'local>,
         return_ssk: jboolean,
     ) -> jobject {
     let res = catch_unwind(&mut env, |env| {
-         // call the centralized library function
-           // convert 43 bytes directly to PaymentAddress - no bech32 round trip
-        let addr_bytes: [u8; 43] = env.convert_byte_array(&address_bytes)?
-            .try_into()
-            .map_err(|_| anyhow!("Address must be exactly 43 bytes"))?;
+        // decode bech32 address string to PaymentAddress
+        let addr_str: String = env.get_string(&address_string)?.into();
+        let payment_address = PaymentAddress::decode(&MainNetwork, &addr_str)
+            .map_err(|e| anyhow!("Failed to decode address: {:?}", e))?;
 
-        let payment_address = PaymentAddress::from_bytes(&addr_bytes)
-            .ok_or_else(|| anyhow!("Invalid PaymentAddress bytes"))?;
-        
-        let rust_data = env.convert_byte_array(&data)?;          // ← convert JByteArray → Vec<u8>
-        let rust_return_ssk = return_ssk == JNI_TRUE;            // ← convert jboolean → bool
+        let rust_data = env.convert_byte_array(&data)?;
+        let rust_return_ssk = return_ssk == JNI_TRUE;
 
         let encrypted_payload = encrypt_data(payment_address, rust_data, rust_return_ssk)
             .map_err(|e| anyhow!("encrypt_data failed: {}", e))?;
 
+        // convert the Rust result into a Java `EncryptedPayload` with byte arrays
+        let epk_java = env.byte_array_from_slice(&encrypted_payload.ephemeral_public_key)?;
+        let ciphertext_java = env.byte_array_from_slice(&encrypted_payload.decrypted_data)?;
 
-        // convert the Rust result into a new Java `EncryptedPayload` object
-        let epk_java = env.new_string(hex::encode(&encrypted_payload.ephemeral_public_key))?;
-        let secretdata_java = env.new_string(hex::encode(&encrypted_payload.decrypted_data))?;
-
-        let ssk_java = match encrypted_payload.symmetric_key {
-            Some(ssk) => env.new_string(hex::encode(ssk))?.into(),
+        let ssk_java: JObject = match encrypted_payload.symmetric_key {
+            Some(ssk) => env.byte_array_from_slice(ssk.expose_secret())?.into(),
             None => JObject::null(),
         };
 
         let result_obj = env.new_object(
             "cash/z/ecc/android/sdk/model/EncryptedPayload",
-            "([B[B[B)",
+            "([B[B[B)V",
             &[
-                JValue::Object(&epk_java),
-                JValue::Object(&secretdata_java),
+                JValue::Object(&epk_java.into()),
+                JValue::Object(&ciphertext_java.into()),
                 JValue::Object(&ssk_java),
             ],
         )?;
@@ -1085,19 +1080,19 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_en
     unwrap_exc_or(&mut env, res, std::ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_decryptData<'local>(
         mut env: JNIEnv<'local>,
         _class: JObject<'local>,
-        ivk_bytes: JByteArray, //ivk bytes
-        ephemeral_public_key_hex: JByteArray,   // epk bytes
-        data_bytes: JByteArray<'local>,             
-        symmetric_key_hex: JByteArray<'local>,          
-    ) -> jbyteArray {
+        ivk_bytes: JByteArray<'local>,
+        ephemeral_public_key_hex: JString<'local>,
+        ciphertext_hex: JString<'local>,
+        symmetric_key_hex: JString<'local>,
+    ) -> jstring {
     let res = catch_unwind(&mut env, |env| {
 
-        // decode bech32 ivk string → 32 raw bytes and do checks
+        // ivk_bytes: ByteArray? → Option<[u8; 32]>
         let ivk: Option<[u8; 32]> = if ivk_bytes.is_null() {
             None
         } else {
@@ -1109,40 +1104,54 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_de
             arr.copy_from_slice(&v);
             Some(arr)
         };
-        // decode hex string of ephemeral public key → 32 raw bytes
+
+        // ephemeralPublicKeyHex: String? → hex decode → Option<[u8; 32]>
         let epk: Option<[u8; 32]> = if ephemeral_public_key_hex.is_null() {
             None
         } else {
-            let epk_hex = env.convert_byte_array(&ephemeral_public_key_hex)?;;
-            Some(epk_hex.try_into().map_err(|_| anyhow!("ephemeral_public_key_hex must be 32 bytes when decoded, got {}", epk_hex.len()))?)
+            let epk_str: String = env.get_string(&ephemeral_public_key_hex)?.into();
+            let epk_decoded = hex::decode(&epk_str)
+                .map_err(|e| anyhow!("Failed to hex-decode ephemeralPublicKeyHex: {}", e))?;
+            let epk_len = epk_decoded.len();
+            Some(epk_decoded.try_into().map_err(|_| anyhow!("ephemeralPublicKeyHex must be 32 bytes when decoded, got {}", epk_len))?)
         };
 
+        // symmetricKeyHex: String? → hex decode → Option<Secret<[u8; 32]>>
         let ssk: Option<Secret<[u8; 32]>> = if symmetric_key_hex.is_null() {
             None
         } else {
-            let hex_str = env.convert_byte_array(&symmetric_key_hex)?;
-            let bytes: [u8; 32] = hex_str.try_into().map_err(|_| anyhow!("Failed to decode SSK hex: expected 32 bytes, got {}", hex_str.len()))?;
+            let ssk_str: String = env.get_string(&symmetric_key_hex)?.into();
+            let ssk_decoded = hex::decode(&ssk_str)
+                .map_err(|e| anyhow!("Failed to hex-decode symmetricKeyHex: {}", e))?;
+            let ssk_len = ssk_decoded.len();
+            let bytes: [u8; 32] = ssk_decoded.try_into().map_err(|_| anyhow!("symmetricKeyHex must be 32 bytes when decoded, got {}", ssk_len))?;
             Some(Secret::new(bytes))
         };
-        // Simplified parameters: 
+
+        // ciphertextHex: String → hex decode → Vec<u8>
+        let ciphertext_str: String = env.get_string(&ciphertext_hex)?.into();
+        let ciphertext_data = hex::decode(&ciphertext_str)
+            .map_err(|e| anyhow!("Failed to hex-decode ciphertextHex: {}", e))?;
+
         let params = DecryptParams {
             ivk_bytes: ivk,
             epk_bytes: epk,
-            data_to_encrypt: env.convert_byte_array(&data_bytes)?, // assuming data_bytes is actually byte-encoded ciphertext
+            data_to_encrypt: ciphertext_data,
             symmetric_key_bytes: ssk,
         };
 
-        let decrypted = decrypt_data(params) // this function name is changed
+        let decrypted = decrypt_data(params)
                     .map_err(|e| anyhow!("decrypt failed: {}", e))?;
 
-        let output = env.byte_array_from_slice(&decrypted)?;
-        Ok(output.into_raw())
+        // return decrypted data as hex string
+        let result_str = env.new_string(hex::encode(&decrypted))?;
+        Ok(result_str.into_raw())
     });
 
     unwrap_exc_or(&mut env, res, std::ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getCurrentAddress<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1187,7 +1196,7 @@ impl zcash_address::TryFromRawAddress for UnifiedAddressParser {
 }
 
 /// Returns the transparent receiver within the given Unified Address, if any.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getTransparentReceiverForUnifiedAddress<
     'local,
 >(
@@ -1231,7 +1240,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getTransp
 }
 
 /// Returns the Sapling receiver within the given Unified Address, if any.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getSaplingReceiverForUnifiedAddress<
     'local,
 >(
@@ -1265,7 +1274,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getSaplin
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidUnifiedSpendingKey<
     'local,
 >(
@@ -1281,7 +1290,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidUn
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidSaplingSpendingKey<
     'local,
 >(
@@ -1297,7 +1306,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidSa
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_isValidSaplingAddress<
     'local,
 >(
@@ -1327,7 +1336,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustDerivationTool_is
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidTransparentAddress<
     'local,
 >(
@@ -1352,7 +1361,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidTr
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidUnifiedAddress<
     'local,
 >(
@@ -1377,7 +1386,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_isValidUn
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[cfg(feature = "transparent-inputs")]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getTotalTransparentBalance<
     'local,
@@ -1429,7 +1438,7 @@ fn parse_protocol(code: i32) -> Option<ShieldedProtocol> {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getMemoAsUtf8<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1505,7 +1514,7 @@ fn decode_blockmeta(env: &mut JNIEnv, obj: JObject) -> anyhow::Result<BlockMeta>
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_writeBlockMetadata<
     'local,
 >(
@@ -1542,7 +1551,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_writeBloc
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getLatestCacheHeight<
     'local,
 >(
@@ -1567,7 +1576,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getLatest
     unwrap_exc_or(&mut env, res, -1)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_findBlockMetadata<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1591,7 +1600,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_findBlock
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_rewindBlockMetadataToHeight<
     'local,
 >(
@@ -1617,7 +1626,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_rewindBlo
     unwrap_exc_or(&mut env, res, ())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getNearestRewindHeight<
     'local,
 >(
@@ -1656,7 +1665,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getNeares
     unwrap_exc_or(&mut env, res, -1) as jlong
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_rewindToHeight<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1699,7 +1708,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_rewindToH
     ))
 }*/
 
-/*#[no_mangle]
+/*#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_putSubtreeRoots<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1768,7 +1777,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_putSubtre
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 */
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_updateChainTip<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1791,7 +1800,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_updateCha
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getFullyScannedHeight<
     'local,
 >(
@@ -1818,7 +1827,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getFullyS
     unwrap_exc_or(&mut env, res, -1)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getMaxScannedHeight<
     'local,
 >(
@@ -1941,7 +1950,7 @@ fn encode_wallet_summary<'a, P: Parameters>(
     )?)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_getWalletSummary<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -1993,7 +2002,7 @@ fn encode_scan_range<'a>(
     )
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_suggestScanRanges<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -2043,7 +2052,7 @@ fn encode_scan_summary<'a>(
     )?)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_scanBlocks<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -2084,7 +2093,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_scanBlock
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_putUtxo<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -2132,7 +2141,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_putUtxo<'
     unwrap_exc_or(&mut env, res, JNI_FALSE)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_decryptAndStoreTransaction<
     'local,
 >(
@@ -2181,7 +2190,7 @@ fn zip317_helper<DbT>(
     )
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_proposeTransfer<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -2253,7 +2262,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_proposeTr
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[cfg(feature = "transparent-inputs")]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_proposeShielding<'local>(
     mut env: JNIEnv<'local>,
@@ -2362,7 +2371,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_proposeSh
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_createProposedTransactions<
     'local,
 >(
@@ -2412,7 +2421,7 @@ pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_createPro
     unwrap_exc_or(&mut env, res, ptr::null_mut())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_branchIdForHeight<'local>(
     mut env: JNIEnv<'local>,
     _: JClass<'local>,
@@ -2458,7 +2467,7 @@ fn parse_network(value: u32) -> anyhow::Result<Network> {
 ///   documentation of pointer::offset.
 /// - Call [`zcashlc_free_keys`] to free the memory associated with the returned pointer
 ///   when done using it.
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[cfg(feature = "transparent-inputs")]
 pub extern "C" fn Java_cash_z_ecc_android_sdk_internal_jni_RustBackend_listTransparentReceivers<
     'local,
